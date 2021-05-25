@@ -3,11 +3,19 @@ server:
 spring:
   application:
     name: minio-util
+  # spring文件大小限制
+  servlet:
+    multipart:
+      enabled: true
+      maxFileSize: 20MB
+      maxRequestSize: 20MB
+      file-size-threshold: 20MB
 
 minio:
   endpoint: http://127.0.0.1:9000
   accessKey: minioadmin
   secretKey: minioadmin
   bucketName: test
+  partSize: 20971520   # 20M
 
 
