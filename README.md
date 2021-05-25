@@ -13,3 +13,8 @@ minio:
     bucketName: test
     partSize: 20971520   # 20M
 ```
+```markdown
+Use the following command to run a standalone MinIO server on the Windows host. Replace D:\ with the path to the drive or directory in which you want MinIO to store data. You must change the terminal or powershell directory to the location of the minio.exe executable, or add the path to that directory to the system $PATH:
+
+<code>minio.exe server D:\ </code>
+```
