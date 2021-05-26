@@ -2,6 +2,7 @@ package com.zymcloud.minioutil.controller;
 
 import com.zymcloud.minioutil.config.FileSuffixEnum;
 import com.zymcloud.minioutil.template.MinioTemplate;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.FileCopyUtils;
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author zhaoyimeng
@@ -51,11 +54,16 @@ public class MinioController {
     /**
      * 预览
      * @param objectName 对象名称
+     * @param width 图片缩略图宽度 为空表示查看原图
+     * @param height 图片缩略图高度 为空表示查看原图
      * @param response   响应体
      * @param request    请求体
      */
     @GetMapping("/preview")
-    public void preview(@RequestParam("objectName") String objectName, HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public void preview(@RequestParam("objectName") String objectName,
+                        @RequestParam(value = "width",required = false) Integer width,
+                        @RequestParam(value = "height",required = false)Integer height,
+                        HttpServletResponse response, HttpServletRequest request) throws Exception {
 
         try (InputStream inputStream = minioTemplate.getObject(bucketName, objectName);) {
             String userAgent = request.getHeader("User-Agent");
@@ -77,9 +85,16 @@ public class MinioController {
             }else {
                 response.setContentType("text/plain");
             }
-
             response.setCharacterEncoding("UTF-8");
-            FileCopyUtils.copy(inputStream, response.getOutputStream());
+
+            // 如果文件是图片，并且传了图片宽度高度，则以缩略图进行展示
+            List<String> imageSuffix = Arrays.asList("bmp", "dib", "gif", "jfif", "jpe", "jpeg", "jpg", "png", "tif", "tiff", "ico");
+            if (imageSuffix.contains(suffix.toLowerCase()) && width!=null && height!=null){
+                Thumbnails.of(inputStream).size(width,height).outputQuality(0.8f).toOutputStream(response.getOutputStream());
+            }else {
+                FileCopyUtils.copy(inputStream, response.getOutputStream());
+            }
+
         } catch (Exception e) {
             throw new Exception("文件读取异常");
         }
