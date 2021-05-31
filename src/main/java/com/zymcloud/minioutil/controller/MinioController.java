@@ -3,6 +3,7 @@ package com.zymcloud.minioutil.controller;
 import com.zymcloud.minioutil.config.FileSuffixEnum;
 import com.zymcloud.minioutil.template.MinioTemplate;
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.FileCopyUtils;
@@ -90,7 +91,9 @@ public class MinioController {
             // 如果文件是图片，并且传了图片宽度高度，则以缩略图进行展示
             List<String> imageSuffix = Arrays.asList("bmp", "dib", "gif", "jfif", "jpe", "jpeg", "jpg", "png", "tif", "tiff", "ico");
             if (imageSuffix.contains(suffix.toLowerCase()) && width!=null && height!=null){
-                Thumbnails.of(inputStream).size(width,height).outputQuality(0.8f).toOutputStream(response.getOutputStream());
+                // .crop(Positions.CENTER) 按照size剪裁图片，多余部分不要
+                // .addFilter(new Canvas(width,height,Positions.CENTER)) 按照size剪裁图片，多余部分用黑色填充
+                Thumbnails.of(inputStream).size(width,height).crop(Positions.CENTER).outputQuality(0.8f).toOutputStream(response.getOutputStream());
             }else {
                 FileCopyUtils.copy(inputStream, response.getOutputStream());
             }
