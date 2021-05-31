@@ -36,6 +36,25 @@
             <version>0.4.8</version>
         </dependency>
 
+        <!--cmyk格式图片转换
+            解决图片压缩出现Unsupported Image Type的问题
+            原因是jdk自带的jpeg解析器不能解析所有jpeg格式的图片，如cmyk（印刷品模式）模式的。图片经过P图之后，保存时默认的保存格式是cmyk格式的，而不是rgb格式。
+            解决方案：使用TwelveMonkeys就可以解决了。
+            TwelveMonkeys的使用比较简单，只要把相关的jar包加入到类路径，
+            他的类我们基本不会用到，只要使用jdk ImageIO或其上层的接口就行了。
+            jdk的ImageIO有自动发现功能，会自动查找相关的编解码类并使用，而不使用jdk默认的编解码类,所以使用这个库是完全无入侵的。
+        -->
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-jpeg</artifactId>
+            <version>3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-tiff</artifactId>
+            <version>3.3</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
